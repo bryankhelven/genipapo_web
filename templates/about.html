@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Genipapo Parser</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('/static/geni.jpg') no-repeat center center fixed;
+            background-size: cover;
+            background-color: rgba(0, 0, 0, 0.65);
+            background-blend-mode: overlay;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .header {
+            width: 100%;
+            background: rgba(3, 112, 49, 0.8);
+            padding: 10px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .header nav {
+            display: flex;
+            justify-content: center;
+            gap: 1em;
+        }
+
+        .header a {
+            text-decoration: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-size: 1em;
+        }
+
+        .header a:hover, .header a.active {
+            background-color: rgba(4, 63, 28, 0.8);
+        }
+
+        .content {
+            margin: 80px auto 0; /* Espaço abaixo do header */
+            max-width: 800px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        p {
+            margin-bottom: 1em;
+        }
+
+        ul {
+            list-style: disc;
+            margin: 10px 0 20px 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        a {
+            color: #2946c5;
+            text-decoration: underline;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: #5573f8;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav>
+            <a href="/">Genipapo</a>
+            <a href="about" class="active">About</a>
+            <a href="contact">Contact Us</a>
+        </nav>
+    </header>
+
+    <div class="content">
+        <h1>Genipapo Parser</h1>
+        <p>
+            Genipapo is a multigenre dependency parser specifically tailored for Brazilian Portuguese, developed in alignment with the Universal Dependencies (UD) framework. Trained using three distinct gold-standard corpora - including journalistic texts, academic papers in the oil and gas domain, and user-generated content from X posts (formerly Twitter) - Genipapo delivers robust syntactic analysis across diverse text genres. Achieving a Labelled Attachment Score (LAS) exceeding 94%, it outperforms or matches the performance of single-genre parsers, making it a versatile tool for use in Natural Language Processing applications.
+        </p>
+        <h2>Acknowledgments</h2>
+        <ul>
+            <li>
+                This work was carried out at the Center for Artificial Intelligence of the University of São Paulo (<a href="http://c4ai.inova.usp.br/">C4AI</a>), with support by the São Paulo Research Foundation (FAPESP grant #2019/07665-4) and by the IBM Corporation. The project was also supported by the Ministry of Science, Technology and Innovation, with resources of Law N. 8.248, of October 23, 1991, within the scope of PPI-SOFTEX, coordinated by Softex and published as Residence in TIC 13, DOU 01245.010222/2022-44.
+            </li>
+            <li>
+                Genipapo was developed using the <a href="https://stanfordnlp.github.io/stanza/">Stanza</a> library. We thank the Stanford NLP Group for providing this tool for the NLP community.
+            </li>
+        </ul>
+    </div>
+</body>
+</html>

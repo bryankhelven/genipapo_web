@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+    <header class="header">
+        <nav>
+          <a href="/" class="active">Genipapo</a>
+          <a href="about">About</a>
+          <a href="contact">Contact Us</a>
+        </nav>
+      </header>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Genipapo Parser</title>
+        <style>
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                font-family: Arial, sans-serif;
+                margin: 0;
+                background: url('/static/geni.jpg') no-repeat center center fixed;
+                background-size: cover;
+                background-color: rgba(0, 0, 0, 0.65); /* Optional overlay for translucency */
+                background-blend-mode: overlay;
+            }
+            #upload-container {
+                text-align: center;
+                background-color: rgba(255, 255, 255, 0.8); /* White background with 80% opacity */
+                padding: 2em;
+                box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+                border-radius: 8px;
+                max-width: 500px;
+            }
+            #button-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 1em; /* Space between buttons */
+                flex-wrap: wrap; /* Allow buttons to wrap if needed */
+            }
+            .custom-file-label {
+                display: inline-block;
+                background-color: #007bff;
+                color: white;
+                padding: 0.5em 1em;
+                border-radius: 4px;
+                cursor: pointer;
+                text-align: center;
+                max-width: 200px; /* Limit width for long file names */
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis; /* Add "..." for long text */
+            }
+            .custom-file-label:hover {
+                background-color: #0056b3;
+            }
+            #submitBtn {
+                padding: 0.5em 2em;
+                background-color: #28a745;
+                color: white;
+                border: none;
+                cursor: pointer;
+                border-radius: 4px;
+            }
+            #submitBtn:disabled {
+                background-color: #999;
+            }
+            #message {
+                margin-top: 1em;
+            }
+            h1 {
+                font-size: 2em;
+                margin-bottom: 1em;
+            }
+            p {
+                font-size: 1.2em;
+                margin-bottom: 1em;
+            }
+            .header {
+                width: 100%;
+                background: rgba(3, 112, 49, 0.8); /* Azul similar ao botão, 80% opacidade */
+                padding: 10px 0;
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 1000;
+              }
+              
+              .header nav {
+                display: flex;
+                justify-content: center; /* Centraliza os botões no meio */
+                gap: 1em; /* Espaço entre os botões */
+              }
+              
+              .header a {
+                text-decoration: none;
+                color: white;
+                padding: 10px 15px;
+                border-radius: 5px;
+                transition: background-color 0.3s;
+                font-size: 1em; /* Tamanho consistente */
+              }
+              
+              .header a:hover, .header a.active {
+                background-color: rgba(4, 63, 28, 0.8); /* Tom mais escuro no hover/seleção */
+              }              
+        </style>
+    </head>
+    <body>
+        <div id="upload-container">
+            <h1>Upload a conllu File</h1>
+            <p>Please upload a conllu file that is properly structured and already has POS tags.</p>
+            
+            <div id="button-container">
+                <!-- Custom file upload button -->
+                <label for="fileInput" class="custom-file-label">Choose File</label>
+                <input type="file" id="fileInput" accept=".conllu" hidden>
+                
+                <!-- Submit button -->
+                <button id="submitBtn" onclick="uploadFile()">Upload and Process</button>
+            </div>
+    
+            <div id="message"></div>
+        </div>
+    
+        <script>
+            const fileInput = document.getElementById('fileInput');
+            const customFileLabel = document.querySelector('.custom-file-label');
+    
+            // Update the custom button text when a file is selected
+            fileInput.addEventListener('change', function () {
+                if (fileInput.files.length > 0) {
+                    customFileLabel.textContent = fileInput.files[0].name;
+                }
+            });
+        </script>
+    </body>
+    
+    
+
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const messageDiv = document.getElementById('message');
+            const submitBtn = document.getElementById('submitBtn');
+    
+            if (!fileInput.files.length) {
+                messageDiv.textContent = 'Please select a .conllu file.';
+                return;
+            }
+    
+            const file = fileInput.files[0];
+            if (!file.name.endsWith('.conllu')) {
+                messageDiv.textContent = 'Only .conllu files are allowed.';
+                return;
+            }
+    
+            messageDiv.textContent = 'Checking file...';
+            submitBtn.disabled = true;
+    
+            // Prepare the file for upload
+            const formData = new FormData();
+            formData.append('file', file);
+    
+            try {
+                // Display progress message
+                messageDiv.textContent = 'File is being processed...';
+    
+                const response = await fetch('/', {
+                    method: 'POST',
+                    body: formData
+                });
+    
+                if (response.ok) {
+                    // Get warnings from headers
+                    const warningsHeader = response.headers.get('X-Warnings');
+                    if (warningsHeader) {
+                        // URL-decode the warnings string
+                        const warningsDecoded = decodeURIComponent(warningsHeader);
+                        // Split the warnings back into an array
+                        const warningsArray = warningsDecoded.split('\n');
+                        // Display warnings to the user
+                        const warningsHtml = warningsArray.map(warning => `<div>${warning}</div>`).join('');
+                        messageDiv.innerHTML = `<div>Warnings:</div>${warningsHtml}`;
+                    } else {
+                        messageDiv.textContent = 'File processed successfully.';
+                    }
+    
+                    // Handle the file download
+                    const blob = await response.blob();
+                    const downloadUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = downloadUrl;
+                    a.download = `${file.name.replace('.conllu', '')}_parsed.conllu`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                } else {
+                    // Read the error message from the response body
+                    const responseText = await response.text();
+                    // Display the error message
+                    messageDiv.innerHTML = `Error: ${responseText}`;
+                }
+            } catch (error) {
+                messageDiv.textContent = `Error: ${error.message}`;
+            } finally {
+                submitBtn.disabled = false;
+            }
+        }
+    </script>
+    
+    
+</body>
+</html>
