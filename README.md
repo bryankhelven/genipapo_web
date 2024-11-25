@@ -117,7 +117,7 @@ The **Genipapo Web** project wraps the functionality of the **Genipapo Parser** 
 
 ## How to cite
 
-Di Felippo, A.; Roman, N.T.; Barbosa, B.K.S.; Pardo, T.A.S. (2024). Genipapo - a Multigenre Dependency Parsing for Brazilian Portuguese. In the Proceedings of the 15th Symposium in Information and Human Language Technology (STIL). November, 17-21. Belém-PA, Brazil. To appear.
+Di Felippo, A.; Roman, N.T.; Barbosa, B.K.S.; Pardo, T.A.S. (2024). Genipapo - a Multigenre Dependency Parsing for Brazilian Portuguese. In the Proceedings of the 15th Symposium in Information and Human Language Technology (STIL). November, 17-21. Belém-PA, Brazil. p. 257-266. DOI: https://doi.org/10.5753/stil.2024.245415
 
 ---
 
