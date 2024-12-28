@@ -110,7 +110,7 @@ When `response_format` is set to `file`, the processed content is returned as a 
 ```bash
 curl -X POST -H "Content-Type: multipart/form-data" \
 -F "file=@example.conllu" \
-"https://genipapo-parser.azurewebsites.net/api/process?response_format=file" \
+"http://localhost:8000/api/process?response_format=file" \
 --output processed_example.conllu
 ```
 
@@ -121,7 +121,7 @@ When `response_format` is set to `json`, the processed content is returned in JS
 ```bash
 curl -X POST -H "Content-Type: multipart/form-data" \
 -F "file=@example.conllu" \
-"https://genipapo-parser.azurewebsites.net/api/process?response_format=json"
+"http://localhost:8000/api/process?response_format=json"
 ```
 
 Example JSON Response:
@@ -143,7 +143,7 @@ Use the `/api/process/json` endpoint to send raw CoNLL-U content as JSON.
 ```bash
 curl -X POST -H "Content-Type: application/json" \
 -d '{"content": "# sent_id = FOLHA_DOC000123_SENT016\n# text = O Capit\u00e3o Am\u00e9rica tamb\u00e9m bajulou o tucano.\n1\tO\to\tDET\t_\tDefinite=Def|Gender=Masc|Number=Sing|PronType=Art\t_\t_\t_\t_\n2\tCapit\u00e3o\tCapit\u00e3o\tPROPN\t_\t_\t_\t_\t_\t_\n3\tAm\u00e9rica\tAm\u00e9rica\tPROPN\t_\t_\t_\t_\t_\t_\n4\ttamb\u00e9m\ttamb\u00e9m\tADV\t_\t_\t_\t_\t_\t_\n5\tbajulou\tbajular\tVERB\t_\tMood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin\t_\t_\t_\t_\n6\to\to\tDET\t_\tDefinite=Def|Gender=Masc|Number=Sing|PronType=Art\t_\t_\t_\t_\n7\ttucano\ttucano\tNOUN\t_\tGender=Masc|Number=Sing\t_\t_\t_\tSpaceAfter=No\n8\t.\t.\tPUNCT\t_\t_\t_\t_\t_\tSpaceAfter=No"}' \
-"https://genipapo-parser.azurewebsites.net/api/process/json"
+"http://localhost:8000/api/process/json"
 ```
 
 Example JSON Response:
