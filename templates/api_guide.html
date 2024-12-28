@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Guide - Genipapo Parser</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('/static/geni.jpg') no-repeat center center fixed;
+            background-size: cover;
+            background-color: rgba(0, 0, 0, 0.65);
+            background-blend-mode: overlay;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .header {
+            width: 100%;
+            background: rgba(3, 112, 49, 0.8);
+            padding: 10px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .header nav {
+            display: flex;
+            justify-content: center;
+            gap: 1em;
+        }
+
+        .header a {
+            text-decoration: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            font-size: 1em;
+        }
+
+        .header a:hover, .header a.active {
+            background-color: rgba(4, 63, 28, 0.8);
+        }
+
+        .content {
+            margin: 80px auto 0;
+            max-width: 800px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        p, pre {
+            margin-bottom: 1em;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            padding: 10px;
+            background: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            overflow-x: auto; /* Horizontal scrolling only if necessary */
+        }
+
+        ul {
+            list-style: disc;
+            margin: 10px 0 20px 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        a {
+            color: #2946c5;
+            text-decoration: underline;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: #5573f8;
+        }
+
+        /* Inline code */
+        code {
+            background: #f4f4f4;
+            border: 1px solid #ddd;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            white-space: normal; /* Inline allows breaking into lines */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            display: inline; /* Ensures inline behavior */
+        }
+
+        /* Block code (inside <pre>) */
+        pre code {
+            background: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap; /* Preserves formatting while allowing line breaks */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            display: block; /* Ensures block behavior */
+            overflow-x: auto; /* Horizontal scrolling only if necessary */
+        }
+
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav>
+            <a href="/">Genipapo</a>
+            <a href="about">About</a>
+            <a href="api_guide" class="active">API Guide</a>
+            <a href="contact">Contact Us</a>
+        </nav>
+    </header>
+
+    <div class="content">
+        <h1>Genipapo API Guide</h1>
+        <p>
+            This guide provides instructions on how to use the Genipapo Parser API for processing
+            Brazilian Portuguese text in CoNLL-U format.
+        </p>
+        <p>
+            All the examples provided in this guide were extracted from the <strong>Porttinari Base</strong> corpus, 
+            part of the <a href="https://sites.google.com/icmc.usp.br/poetisa/porttinari-2-0" target="_blank">Poetisa project</a>.
+        </p>
+
+        <h2>Endpoints</h2>
+        <ul>
+            <li><strong>POST /api/process</strong> - Process a <code>.conllu</code> file.</li>
+            <li><strong>POST /api/process/json</strong> - Process raw <code>.conllu</code> content in JSON format.</li>
+        </ul>
+
+        <h2>1. Process a File</h2>
+        <p>
+            Use the <code>/api/process</code> endpoint to upload a <code>.conllu</code> file. The endpoint accepts the following parameter:
+        </p>
+        <ul>
+            <li><strong>response_format</strong> (optional): Set to <code>json</code> to return processed content as JSON. Defaults to <code>file</code>.</li>
+        </ul>
+
+        <h3>1.1 Example: Returning a File</h3>
+        <p>
+            When <code>response_format</code> is set to <code>file</code>, the processed content is returned as a downloadable
+            <code>.conllu</code> file. Specify the output filename using <code>--output</code>.
+        </p>
+        <pre><code>curl -X POST -H "Content-Type: multipart/form-data" \
+-F "file=@example.conllu" \
+"https://genipapo-parser.azurewebsites.net/api/process?response_format=file" \
+--output processed_example.conllu</code></pre>
+
+        <h3>1.2 Example: Returning JSON</h3>
+        <p>
+            When <code>response_format</code> is set to <code>json</code>, the processed content is returned in JSON format.
+        </p>
+        <pre><code>curl -X POST -H "Content-Type: multipart/form-data" \
+-F "file=@example.conllu" \
+"https://genipapo-parser.azurewebsites.net/api/process?response_format=json"</code></pre>
+
+        <h4>Example JSON Response:</h4>
+        <pre><code>{
+    "status": "success",
+    "warnings": [],
+    "processed_content": "# sent_id = FOLHA_DOC000123_SENT016\n# text = O Capitão América também bajulou o tucano.\n1\tO\to\tDET\t_\tDefinite=Def|Gender=Masc|Number=Sing|PronType=Art\t2\tdet\t_\t_\n2\tCapitão\tCapitão\tPROPN\t_\t_\t5\tnsubj\t_\t_\n3\tAmérica\tAmérica\tPROPN\t_\t_\t2\tflat:name\t_\t_\n4\ttambém\ttambém\tADV\t_\t_\t5\tadvmod\t_\t_\n5\tbajulou\tbajular\tVERB\t_\tMood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin\t0\troot\t_\t_\n6\to\to\tDET\t_\tDefinite=Def|Gender=Masc|Number=Sing|PronType=Art\t7\tdet\t_\t_\n7\ttucano\ttucano\tNOUN\t_\tGender=Masc|Number=Sing\t5\tobj\t_\tSpaceAfter=No\n8\t.\t.\tPUNCT\t_\t_\t5\tpunct\t_\tSpaceAfter=No\n"
+}</code></pre>
+
+        <h2>2. Process Raw Content</h2>
+        <p>
+            Use the <code>/api/process/json</code> endpoint to send raw CoNLL-U content as JSON. Include the content
+            in the <code>content</code> field of the JSON body.
+        </p>
+        <pre><code>curl -X POST -H "Content-Type: application/json" \
+-d '{"content": "# sent_id = FOLHA_DOC000123_SENT016
+# text = O Capitão América também bajulou o tucano.
+1\tO\to\tDET\t_\tDefinite=Def|Gender=Masc|Number=Sing|PronType=Art\t_\t_\t_\t_
+2\tCapitão\tCapitão\tPROPN\t_\t_\t_\t_\t_\t_
+3\tAmérica\tAmérica\tPROPN\t_\t_\t_\t_\t_\t_
+4\ttambém\ttambém\tADV\t_\t_\t_\t_\t_\t_
+5\tbajulou\tbajular\tVERB\t_\tMood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin\t_\t_\t_\t_
+6\to\to\tDET\t_\tDefinite=Def|Gender=Masc|Number=Sing|PronType=Art\t_\t_\t_\t_
+7\ttucano\ttucano\tNOUN\t_\tGender=Masc|Number=Sing\t_\t_\t_\tSpaceAfter=No
+8\t.\t.\tPUNCT\t_\t_\t_\t_\t_\tSpaceAfter=No"}' \
+"http://localhost:8000/api/process/json"</code></pre>
+
+        <h4>Example JSON Response:</h4>
+        <pre><code>{
+    "status": "success",
+    "warnings": [],
+    "processed_content": "# sent_id = FOLHA_DOC000123_SENT016\n# text = O Capitão América também bajulou o tucano.\n1\tO\to\tDET\t_\tDefinite=Def|Gender=Masc|Number=Sing|PronType=Art\t2\tdet\t_\t_\n2\tCapitão\tCapitão\tPROPN\t_\t_\t5\tnsubj\t_\t_\n3\tAmérica\tAmérica\tPROPN\t_\t_\t2\tflat:name\t_\t_\n4\ttambém\ttambém\tADV\t_\t_\t5\tadvmod\t_\t_\n5\tbajulou\tbajular\tVERB\t_\tMood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin\t0\troot\t_\t_\n6\to\to\tDET\t_\tDefinite=Def|Gender=Masc|Number=Sing|PronType=Art\t7\tdet\t_\t_\n7\ttucano\ttucano\tNOUN\t_\tGender=Masc|Number=Sing\t5\tobj\t_\tSpaceAfter=No\n8\t.\t.\tPUNCT\t_\t_\t5\tpunct\t_\tSpaceAfter=No\n"
+}</code></pre>
+
+        <h3>Example with Input and Output</h3>
+
+        <h4>Original Input</h4>
+        <pre><code># sent_id = FOLHA_DOC000123_SENT016
+# text = O Capitão América também bajulou o tucano.
+1   O       o       DET     _       Definite=Def|Gender=Masc|Number=Sing|PronType=Art   _   _   _   _
+2   Capitão Capitão PROPN   _       _                                               _   _   _   _
+3   América América PROPN   _       _                                               _   _   _   _
+4   também  também  ADV     _       _                                               _   _   _   _
+5   bajulou bajular VERB    _       Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin _   _   _   _
+6   o       o       DET     _       Definite=Def|Gender=Masc|Number=Sing|PronType=Art   _   _   _   _
+7   tucano  tucano  NOUN    _       Gender=Masc|Number=Sing                            _   _   _   SpaceAfter=No
+8   .       .       PUNCT   _       _                                               _   _   _   SpaceAfter=No</code></pre>
+
+        <h4>Processed Output</h4>
+        <pre><code># sent_id = FOLHA_DOC000123_SENT016
+# text = O Capitão América também bajulou o tucano.
+1   O       o       DET     _       Definite=Def|Gender=Masc|Number=Sing|PronType=Art   2   det     _   _
+2   Capitão Capitão PROPN   _       _                                                   5   nsubj   _   _
+3   América América PROPN   _       _                                                   2   flat:name _   _
+4   também  também  ADV     _       _                                                   5   advmod  _   _
+5   bajulou bajular VERB    _       Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin 0   root    _   _
+6   o       o       DET     _       Definite=Def|Gender=Masc|Number=Sing|PronType=Art   7   det     _   _
+7   tucano  tucano  NOUN    _       Gender=Masc|Number=Sing                              5   obj     _   SpaceAfter=No
+8   .       .       PUNCT   _       _                                                   5   punct   _   SpaceAfter=No</code></pre>
+
+        <h2>Contact</h2>
+        <p>
+            For further assistance, please <a href="https://genipapo-parser.azurewebsites.net/contact">contact us</a>.
+        </p>
+    </div>
+

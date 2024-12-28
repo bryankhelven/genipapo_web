@@ -1,5 +1,5 @@
 import urllib.parse
-from flask import Flask, request, send_file, render_template, make_response
+from flask import Flask, request, send_file, render_template, make_response, jsonify
 import stanza
 from stanza.utils.conll import CoNLL
 from conllu import parse_incr
@@ -175,13 +175,95 @@ def process_file(input_file_path, original_filename):
 
     return output_file_path
 
+@app.route('/api/process', methods=['POST'])
+def process_api():
+    response_format = request.args.get('response_format', 'file')
+
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part in the request'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No file selected'}), 400
+
+    if not file.filename.endswith('.conllu'):
+        return jsonify({'error': 'Invalid file type. Only .conllu files are allowed.'}), 400
+
+    content = file.read().decode('utf-8')
+    is_valid, errors, warnings = validate_conllu_file(content)
+    if not is_valid:
+        return jsonify({'status': 'error', 'errors': errors, 'warnings': warnings}), 400
+
+    # Save the valid file and process it
+    input_temp_path = save_temp_file(content)
+
+    try:
+        output_file_path = process_file(input_temp_path, file.filename)
+
+        if response_format == 'json':
+            # Read the processed content from the file
+            with open(output_file_path, 'r', encoding='utf-8') as processed_file:
+                output_content = processed_file.read()
+
+            return jsonify({
+                'status': 'success',
+                'warnings': warnings,
+                'processed_content': output_content
+            }), 200
+        else:
+            # Return the processed file directly
+            response = send_file(output_file_path, as_attachment=True, download_name='processed.conllu')
+            if warnings:
+                warnings_str = '\n'.join(warnings)
+                response.headers['X-Warnings'] = urllib.parse.quote(warnings_str)
+            return response
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 @app.route('/about')
 def about():
     return render_template('about.html')
 
+@app.route('/api/process/json', methods=['POST'])
+def process_api_json():
+    # Check if the request body contains JSON
+    if not request.is_json:
+        return jsonify({'error': 'Request body must be JSON'}), 400
+
+    data = request.get_json()
+    content = data.get('content')
+    if not content:
+        return jsonify({'error': 'JSON must include a "content" field with .conllu data'}), 400
+
+    # Validate the .conllu content
+    is_valid, errors, warnings = validate_conllu_file(content)
+    if not is_valid:
+        return jsonify({'status': 'error', 'errors': errors, 'warnings': warnings}), 400
+
+    try:
+        # Save the valid content to a temporary file
+        input_temp_path = save_temp_file(content)
+        output_file_path = process_file(input_temp_path, "input.conllu")
+
+        # Read the processed content from the file
+        with open(output_file_path, 'r', encoding='utf-8') as processed_file:
+            output_content = processed_file.read()
+
+        return jsonify({
+            'status': 'success',
+            'warnings': warnings,
+            'processed_content': output_content
+        }), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
+
+@app.route('/api_guide')
+def api_guide():
+    return render_template('api_guide.html')
 
 if __name__ == '__main__':
     # Run the app on port 8000
